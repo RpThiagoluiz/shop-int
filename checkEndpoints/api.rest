@@ -1,0 +1,17 @@
+@baseUrl = http://localhost:3000
+
+### GET
+GET {{baseUrl}}/healthApi
+
+### POST
+POST {{baseUrl}}/upload
+Content-Type: application/json
+
+{
+  "image": "asset2",
+  "customer_code": "A1",
+  "measure_datetime": "1724887714",
+  "measure_type": "GAS"
+}
+
+

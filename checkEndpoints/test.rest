@@ -1,5 +1,0 @@
-@host = http://localhost:80
-@baseUrl = {{host}}
-
-### GET
-GET {{baseUrl}}
