@@ -1,0 +1,32 @@
+services:
+   db:
+      image: postgres:16
+      ports:
+         - '5432:5432'
+      environment:
+         POSTGRES_USER: admin
+         POSTGRES_PASSWORD: admin123
+         POSTGRES_DB: measures
+      volumes:
+         - postgres_data:/var/lib/postgresql/data
+      networks:
+         - app-network
+
+   api:
+      build: .
+      environment:
+         GEMINI_API_KEY: ${GEMINI_API_KEY}
+         DATABASE_URL: postgres://admin:admin123@localhost:5432/measures
+      ports:
+         - '3000:3000'
+      depends_on:
+         - db
+      networks:
+         - app-network
+
+volumes:
+   postgres_data:
+
+networks:
+   app-network:
+      driver: bridge
