@@ -1,14 +1,11 @@
-import { ErrorType } from '../../types/errorType'
-import { MeasureType } from '../../types/measureType';
+import { ServiceError } from '../../types/ServiceError'
+import { MeasureType } from '../../types/measureType'
 
-
-type GeminiApiClientResponse = | {
-   image_url: string
+type GeminiApiClientResponse = {
    measure_value: number
-   measure_uuid: string
 }
 
-type Result = | GeminiApiClientResponse | ErrorType
+type Result = GeminiApiClientResponse | ServiceError
 
 export class GeminiApiClient {
    async getMeasureFromImage({
@@ -22,16 +19,12 @@ export class GeminiApiClient {
          console.debug({ imageBase64, measureType })
          const response = {
             data: {
-               "image_url": `image_url MOCK`,
-               "measure_uuid": 'measure_uuid MOCK',
-               "measure_value": 15
+               measure_value: 15
             }
          }
 
          return {
-            image_url: response.data.image_url,
-            measure_uuid: response.data.measure_uuid,
-            measure_value: response.data.measure_value,
+            measure_value: response.data.measure_value
          }
       } catch (error) {
          console.error(error)
@@ -45,7 +38,6 @@ export class GeminiApiClient {
       }
    }
 }
-
 
 // function getMimeTypeFromBase64(base64String: string): string | null {
 //    const match = base64String.match(/^data:image\/(\w+);base64,/i);
