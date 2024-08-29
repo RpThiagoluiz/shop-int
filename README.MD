@@ -11,3 +11,8 @@ yarn start:dev
 ```bash
 yarn build
 ```
+
+Criar testes unitários com o que já temos
+Realizar a integração de um ORM e DB
+Realizar a integração do LLM
+Imagem deve ser temporária
