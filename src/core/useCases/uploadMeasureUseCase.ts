@@ -1,7 +1,8 @@
-import { Buffer } from 'buffer';
+import { v4 as uuidv4 } from 'uuid'
+import { Buffer } from 'buffer'
 import { GeminiApiClient } from '../../infra/external/LLM'
-import { ErrorType } from '../../types/errorType'
-import { MeasureEnum } from '../../types/measureType'
+import { ServiceError } from '../../types/ServiceError'
+import { MeasureEnum, MeasureType } from '../../types/measureType'
 import { UploadMeasureRequestDTO, UploadMeasureResponseDTO } from '../dtos/uploadMeasureDTO'
 import { MeasureEntity } from '../entities/measureEntity'
 import { MeasureRepository } from '../repositories/MeasureRepository'
@@ -9,11 +10,10 @@ import { MeasureRepository } from '../repositories/MeasureRepository'
 export class UploadMeasureUseCase {
    constructor(
       private measureRepository: MeasureRepository,
-      private geminiApiClient: GeminiApiClient,
+      private geminiApiClient: GeminiApiClient
    ) { }
 
-   async execute(data: UploadMeasureRequestDTO): Promise<UploadMeasureResponseDTO | ErrorType> {
-
+   async execute(data: UploadMeasureRequestDTO): Promise<UploadMeasureResponseDTO | ServiceError> {
       const checkData = verifyFields(data)
 
       if (!checkData.isValid) {
@@ -24,7 +24,6 @@ export class UploadMeasureUseCase {
          }
       }
 
-
       // Logica para validar se a data é do mesmo mês se for retorna.
       // const findMeasure = await this.measureRepository.listMeasuresByCustomer({
       //    customerCode: data.customerCode,
@@ -32,7 +31,7 @@ export class UploadMeasureUseCase {
       // })
 
       // if (findMeasure) {
-      //    
+      //
       //    return {
       //       error_status: 409,
       //       error_code: 'DOUBLE_REPORT',
@@ -49,18 +48,19 @@ export class UploadMeasureUseCase {
          return {
             error_status: LLMResponse.error_status,
             error_code: LLMResponse.error_code,
-            error_description: LLMResponse.error_description,
-
+            error_description: LLMResponse.error_description
          }
       }
 
       const newMeasure = new MeasureEntity({
-         measure_uuid: LLMResponse.measure_uuid,
+         measure_uuid: uuidv4(),
          customer_code: data.customer_code,
          measure_datetime: data.measure_datetime,
-         measure_type: data.measure_type,
+         //Não permitir dados salvos de forma diferentes. Gas, GAS, gAs.
+         measure_type: data.measure_type.toUpperCase() as MeasureType,
          measure_value: LLMResponse.measure_value,
-         image_url: LLMResponse.image_url
+         image_url: 'Link temporário',
+         has_confirmed: false
       })
 
       /**
@@ -72,9 +72,9 @@ export class UploadMeasureUseCase {
       await this.measureRepository.save({ measure: newMeasure })
 
       return {
-         image_url: LLMResponse.image_url,
+         image_url: newMeasure.image_url,
          measure_value: LLMResponse.measure_value,
-         measure_uuid: LLMResponse.measure_uuid,
+         measure_uuid: newMeasure.measure_uuid
       }
    }
 }
@@ -86,7 +86,6 @@ function verifyFields(data: any): {
 } {
    const requiredKeys = ['image', 'customer_code', 'measure_datetime', 'measure_type']
    const hasAllKeys = requiredKeys.every((key) => key in data)
-
 
    if (!hasAllKeys)
       return {
@@ -111,7 +110,7 @@ function verifyFields(data: any): {
       fieldsErros.push('data mensurada')
    }
 
-   if (data.measure_type !== MeasureEnum.GAS && data.measure_type !== MeasureEnum.WATER) {
+   if (data.measure_type.toUppercase() !== MeasureEnum.GAS && data.measure_type.toUpperCase() !== MeasureEnum.WATER) {
       isValid = false
       fieldsErros.push('tipo mensurado')
    }
@@ -131,26 +130,25 @@ function verifyFields(data: any): {
    }
 }
 
-
-
+// Utils para validar a image
+// e outro para realizar a criação da url temporaria.
 function isValidImage(base64String: string): boolean {
-
    if (typeof base64String !== 'string') {
       return false
    }
 
-   const regex = /^data:image\/(png|jpeg|WEBP|HEIC|HEIF);base64,/;
+   const regex = /^data:image\/(png|jpeg|WEBP|HEIC|HEIF);base64,/
    if (!regex.test(base64String)) {
-      return false;
+      return false
    }
 
-   const base64Data = base64String.replace(/^data:image\/\w+;base64,/, '');
+   const base64Data = base64String.replace(/^data:image\/\w+;base64,/, '')
 
    try {
-      Buffer.from(base64Data, 'base64');
-      return true;
+      Buffer.from(base64Data, 'base64')
+      return true
    } catch (error) {
       console.error('ERROR IN validateBase64Image', { error })
-      return false;
+      return false
    }
 }
