@@ -1,8 +1,6 @@
 @baseUrl = http://localhost:3000
-
-### GET
-GET {{baseUrl}}/healthApi
-
+# Definindo a data no formato ISO 8601
+let data = new Date().toISOString();
 ### POST
 POST {{baseUrl}}/upload
 Content-Type: application/json
@@ -10,14 +8,16 @@ Content-Type: application/json
 {
   "image": "asset2",
   "customer_code": "A1",
-  "measure_datetime": "1724887714",
+  "measure_datetime": "2024-08-29T10:30:00Z",
   "measure_type": "GAS"
 }
+
+### "measure_uuid": "ba3e85be-e8de-436b-95d2-d8ffa1b32b88"
 
 ### GET - List Measures
 GET {{baseUrl}}/test/list?measure_type=array
 ### GET - List Measures
-GET {{baseUrl}}/test/list?measure_type=gas
+GET {{baseUrl}}/A1/list?measure_type=gas
 ### GET - List Measures
 GET {{baseUrl}}/test/list
 
@@ -26,7 +26,7 @@ PATCH {{baseUrl}}/confirm
 Content-Type: application/json
 
 {
-  "measure_uuid": "asset2",
+  "measure_uuid": "ba3e85be-e8de-436b-95d2-d8ffa1b32b88",
   "confirmed_value": 23
 }
 

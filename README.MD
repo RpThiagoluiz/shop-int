@@ -13,6 +13,8 @@ yarn build
 ```
 
 Criar testes unitários com o que já temos
-Realizar a integração de um ORM e DB
+Ajustar como a imagem chega para o backend, ela deve ser um multpart devido ao tamanho.
+
+# Important
 Realizar a integração do LLM
 Imagem deve ser temporária

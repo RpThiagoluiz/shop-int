@@ -3,7 +3,7 @@ import { type MeasureType } from '../../types/measureType'
 export type UploadMeasureRequestDTO = {
    image: string
    customer_code: string
-   measure_datetime: string
+   measure_datetime: Date
    measure_type: MeasureType
 }
 
