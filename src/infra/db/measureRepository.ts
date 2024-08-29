@@ -1,29 +1,83 @@
-import { MeasureType } from '../../types/measureType'
+import { type MeasureType } from '../../types/measureType'
 import { MeasureRepository } from '../../core/repositories/MeasureRepository'
 import { MeasureEntity } from '../../core/entities/measureEntity'
 
 export class PostgresMeasureRepository implements MeasureRepository {
-   findByUuid({ measureUuid }: { measureUuid: string }): Promise<MeasureEntity> {
-      throw new Error('Method not implemented.')
+   findByUuid({ measure_uuid }: { measure_uuid: string }): Promise<MeasureEntity> {
+      const mockedData: MeasureEntity = {
+         measure_uuid: measure_uuid,
+         customer_code: 'params.customer_code',
+         measure_datetime: '2024-08-29T11:02:02Z',
+         measure_type: 'WATER',
+         measure_value: 123.45,
+         has_confirmed: false,
+         image_url: 'https://example.com/image.jpg'
+      }
+
+      return Promise.resolve(mockedData)
    }
-   confirmMeasure({ measureUuid, confirmedValue }: { measureUuid: string; confirmedValue: number }): Promise<void> {
-      throw new Error('Method not implemented.')
+   confirmMeasure({
+      measure_uuid,
+      confirmed_value
+   }: {
+      measure_uuid: string
+      confirmed_value: number
+   }): Promise<void> {
+      const mockedData: MeasureEntity = {
+         measure_uuid: measure_uuid,
+         customer_code: 'params.customer_code',
+         measure_datetime: '2024-08-29T11:02:02Z',
+         measure_type: 'WATER',
+         measure_value: confirmed_value,
+         has_confirmed: true,
+         image_url: 'https://example.com/image.jpg'
+      }
+
+      return Promise.resolve()
    }
-   listMeasuresByCustomer({ customerCode, measureType }: { customerCode: string; measureType?: MeasureType }): Promise<MeasureEntity[]> {
-      throw new Error('Method not implemented.')
+   listMeasuresByCustomer({
+      customer_code,
+      measure_type
+   }: {
+      customer_code: string
+      measure_type?: MeasureType
+   }): Promise<MeasureEntity[] | []> {
+      const mockedData: MeasureEntity[] = [
+         {
+            measure_uuid: 'uuid1',
+            customer_code: 'params.customer_code',
+            measure_datetime: '2024-08-29T11:02:02Z',
+            measure_type: 'WATER',
+            measure_value: 123.45,
+            has_confirmed: false,
+            image_url: 'https://example.com/image.jpg'
+         },
+         {
+            measure_uuid: 'uuid3',
+            customer_code: 'params.customer_code',
+            measure_datetime: '2024-08-29T11:02:02Z',
+            measure_type: 'WATER',
+            measure_value: 123.45,
+            has_confirmed: false,
+            image_url: 'https://example.com/image.jpg'
+         },
+         {
+            measure_uuid: 'uuid2',
+            customer_code: 'params.customer_code',
+            measure_datetime: '2024-08-29T11:02:02Z',
+            measure_type: 'GAS',
+            measure_value: 123.45,
+            has_confirmed: false,
+            image_url: 'https://example.com/image.jpg'
+         }
+      ]
+
+      return Promise.resolve(mockedData)
    }
-   // findByUuid({ measureUuid }: { measureUuid: string }): Promise<MeasureEntity> {
-   //    throw new Error('Method not implemented.')
-   // }
-   // confirmMeasure({ measureUuid, confirmedValue }: { measureUuid: string; confirmedValue: number }): Promise<void> {
-   //    throw new Error('Method not implemented.')
-   // }
-   // listMeasuresByCustomer({ customerCode, measureType }: { customerCode: string; measureType?: MeasureType }): Promise<MeasureEntity[]> {
-   //    throw new Error('Method not implemented.')
-   // }
 
    async save({ measure }: { measure: MeasureEntity }): Promise<void> {
       console.log({ measure })
+      // recuperar o retorno da criação
       // await this.db.insert('measures', {
       //    uuid: measure.uuid,
       //    customer_code: measure.customerCode,
