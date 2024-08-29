@@ -1,12 +1,5 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
-import { dbUrl } from '../../constants/env'
-import * as schema from './schema'
+import { PrismaClient } from '@prisma/client'
 
-const pool = new Pool({
-   connectionString: dbUrl
-})
-
-export const db = drizzle(pool, {
-   schema
+export const db = new PrismaClient({
+   log: ['query']
 })

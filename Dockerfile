@@ -1,6 +1,6 @@
 FROM node:20-alphine
 
-WORKDIR /app
+WORKDIR /dist
 
 COPY package*.json ./
 

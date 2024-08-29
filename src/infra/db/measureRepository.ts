@@ -1,177 +1,90 @@
 import { type MeasureType } from '../../types/measureType'
 import { MeasureRepository } from '../../core/repositories/MeasureRepository'
 import { MeasureEntity } from '../../core/entities/measureEntity'
+import { db } from './connection'
+import { type CreateMeasureResponse } from '../../types/createMeasureResponse'
+import { type ListMeasuresByCustomerResponse } from '../../types/listMeasureResponse'
+import { type FindMeasureById } from '../../types/findMeasuseById'
 
 export class PostgresMeasureRepository implements MeasureRepository {
-   findByUuid({ measure_uuid }: { measure_uuid: string }): Promise<MeasureEntity> {
-      const mockedData: MeasureEntity = {
-         measure_uuid: measure_uuid,
-         customer_code: 'params.customer_code',
-         measure_datetime: '2024-08-29T11:02:02Z',
-         measure_type: 'WATER',
-         measure_value: 123.45,
-         has_confirmed: false,
-         image_url: 'https://example.com/image.jpg'
-      }
 
-      return Promise.resolve(mockedData)
+   private measureDB = db.measure
+
+   async findByUuid({ measure_uuid }: { measure_uuid: string }): Promise<FindMeasureById> {
+
+      const measure = await this.measureDB.findFirst({
+         select: {
+            measure_uuid: true,
+            has_confirmed: true,
+         },
+         where: {
+            measure_uuid,
+         }
+      })
+
+      return measure
    }
-   confirmMeasure({
+
+   async confirmMeasure({
       measure_uuid,
       confirmed_value
    }: {
       measure_uuid: string
       confirmed_value: number
    }): Promise<void> {
-      const mockedData: MeasureEntity = {
-         measure_uuid: measure_uuid,
-         customer_code: 'params.customer_code',
-         measure_datetime: '2024-08-29T11:02:02Z',
-         measure_type: 'WATER',
-         measure_value: confirmed_value,
-         has_confirmed: true,
-         image_url: 'https://example.com/image.jpg'
-      }
 
-      return Promise.resolve()
+      await this.measureDB.update({
+         where: {
+            measure_uuid
+         },
+         data: {
+            measure_value: confirmed_value
+         }
+      })
+
    }
-   listMeasuresByCustomer({
+
+   async listMeasuresByCustomer({
       customer_code,
       measure_type
    }: {
       customer_code: string
       measure_type?: MeasureType
-   }): Promise<MeasureEntity[] | []> {
-      const mockedData: MeasureEntity[] = [
-         {
-            measure_uuid: 'uuid1',
-            customer_code: 'params.customer_code',
-            measure_datetime: '2024-08-29T11:02:02Z',
-            measure_type: 'WATER',
-            measure_value: 123.45,
-            has_confirmed: false,
-            image_url: 'https://example.com/image.jpg'
+   }): Promise<ListMeasuresByCustomerResponse[] | []> {
+
+      const measures = await this.measureDB.findMany({
+         select: {
+            measure_uuid: true,
+            measure_datetime: true,
+            measure_type: true,
+            has_confirmed: true,
+            image_url: true,
          },
-         {
-            measure_uuid: 'uuid3',
-            customer_code: 'params.customer_code',
-            measure_datetime: '2024-08-29T11:02:02Z',
-            measure_type: 'WATER',
-            measure_value: 123.45,
-            has_confirmed: false,
-            image_url: 'https://example.com/image.jpg'
-         },
-         {
-            measure_uuid: 'uuid2',
-            customer_code: 'params.customer_code',
-            measure_datetime: '2024-08-29T11:02:02Z',
-            measure_type: 'GAS',
-            measure_value: 123.45,
-            has_confirmed: false,
-            image_url: 'https://example.com/image.jpg'
+         where: {
+            customer_code,
+            ...(measure_type && { measure_type })
          }
-      ]
+      })
 
-      return Promise.resolve(mockedData)
+      return measures
    }
 
-   async save({ measure }: { measure: MeasureEntity }): Promise<void> {
-      console.log({ measure })
-      // recuperar o retorno da criação
-      // await this.db.insert('measures', {
-      //    uuid: measure.uuid,
-      //    customer_code: measure.customerCode,
-      //    measure_datetime: measure.measureDatetime,
-      //    measure_type: measure.measureType,
-      //    measure_value: measure.measureValue,
-      //    confirmed: measure.confirmed,
-      //    image_url: measure.imageUrl
-      // })
+   async save({ data }: { data: MeasureEntity }): Promise<CreateMeasureResponse> {
+
+      const measure = await this.measureDB.create({
+         data: {
+            customer_code: data.customer_code,
+            measure_datetime: data.measure_datetime,
+            measure_type: data.measure_type,
+            measure_value: data.measure_value,
+            image_url: data.image_url
+         }
+      })
+
+      return {
+         measure_uuid: measure.measure_uuid,
+         image_url: measure.image_url,
+         measure_value: measure.measure_value,
+      }
    }
-
-   // async findByCustomerCodeAndMonth({
-   //    customerCode,
-   //    measureType
-   // }: {
-   //    customerCode: string
-   //    measureType: MeasureType
-   // }): Promise<Measure | null> {
-   //    const result = await this.db
-   //       .query('measures')
-   //       .where({
-   //          customer_code: customerCode,
-   //          measure_type: measureType
-   //       })
-   //       .first()
-
-   //    return result
-   //       ? new Measure(
-   //          result.uuid,
-   //          result.customer_code,
-   //          result.measure_datetime,
-   //          result.measure_type,
-   //          result.measure_value,
-   //          result.confirmed,
-   //          result.image_url
-   //       )
-   //       : null
-   // }
-
-   // async findByUuid({ measureUuid }: { measureUuid: string }): Promise<Measure | null> {
-   //    const result = await this.db.query('measures').where({ uuid: measureUuid }).first()
-
-   //    return result
-   //       ? new Measure(
-   //          result.uuid,
-   //          result.customer_code,
-   //          result.measure_datetime,
-   //          result.measure_type,
-   //          result.measure_value,
-   //          result.confirmed,
-   //          result.image_url
-   //       )
-   //       : null
-   // }
-
-   // async confirmMeasure({
-   //    measureUuid,
-   //    confirmedValue
-   // }: {
-   //    measureUuid: string
-   //    confirmedValue: number
-   // }): Promise<void> {
-   //    await this.db
-   //       .update('measures')
-   //       .set({ measure_value: confirmedValue, confirmed: true })
-   //       .where({ uuid: measureUuid })
-   // }
-
-   // async listMeasuresByCustomer({
-   //    customerCode,
-   //    measureType
-   // }: {
-   //    customerCode: string
-   //    measureType?: MeasureType
-   // }): Promise<Measure[]> {
-   //    const query = this.db.query('measures').where({ customer_code: customerCode })
-
-   //    if (measureType) {
-   //       query.where({ measure_type: measureType })
-   //    }
-
-   //    const results = await query
-
-   //    return results.map(
-   //       (result) =>
-   //          new Measure(
-   //             result.uuid,
-   //             result.customer_code,
-   //             result.measure_datetime,
-   //             result.measure_type,
-   //             result.measure_value,
-   //             result.confirmed,
-   //             result.image_url
-   //          )
-   //    )
-   // }
 }
