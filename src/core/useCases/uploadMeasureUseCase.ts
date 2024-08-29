@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import { Buffer } from 'buffer'
 import { GeminiApiClient } from '../../infra/external/LLM'
 import { ServiceError } from '../../types/ServiceError'
@@ -53,14 +52,11 @@ export class UploadMeasureUseCase {
       }
 
       const newMeasure = new MeasureEntity({
-         measure_uuid: uuidv4(),
          customer_code: data.customer_code,
          measure_datetime: data.measure_datetime,
-         //Não permitir dados salvos de forma diferentes. Gas, GAS, gAs.
          measure_type: data.measure_type.toUpperCase() as MeasureType,
          measure_value: LLMResponse.measure_value,
-         image_url: 'Link temporário',
-         has_confirmed: false
+         image_url: 'https://storage.googleapis.com/generativeai-downloads/images/jetpack.jpg',
       })
 
       /**
@@ -69,12 +65,12 @@ export class UploadMeasureUseCase {
        * Rollback
        */
 
-      await this.measureRepository.save({ measure: newMeasure })
+      const measureInsert = await this.measureRepository.save({ data: newMeasure })
 
       return {
-         image_url: newMeasure.image_url,
-         measure_value: LLMResponse.measure_value,
-         measure_uuid: newMeasure.measure_uuid
+         image_url: measureInsert.image_url,
+         measure_value: measureInsert.measure_value,
+         measure_uuid: measureInsert.measure_uuid
       }
    }
 }
@@ -105,12 +101,16 @@ function verifyFields(data: any): {
       isValid = false
       fieldsErros.push('código do cliente')
    }
-   if (typeof data.measure_datetime !== 'string') {
+
+   if (!isValidISO8601(data.measure_datetime)) {
       isValid = false
-      fieldsErros.push('data mensurada')
+      fieldsErros.push('data mensurada(ISO8601)')
    }
 
-   if (data.measure_type.toUppercase() !== MeasureEnum.GAS && data.measure_type.toUpperCase() !== MeasureEnum.WATER) {
+   if (
+      data.measure_type.toUpperCase() !== MeasureEnum.GAS &&
+      data.measure_type.toUpperCase() !== MeasureEnum.WATER
+   ) {
       isValid = false
       fieldsErros.push('tipo mensurado')
    }
@@ -128,6 +128,11 @@ function verifyFields(data: any): {
    return {
       isValid
    }
+}
+
+function isValidISO8601(dateString: string): boolean {
+   const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d+)?Z$/;
+   return regex.test(dateString);
 }
 
 // Utils para validar a image
