@@ -1,5 +1,6 @@
 import { GeminiApiClient } from '../../infra/external/LLM'
 import { ServiceError } from '../../types/ServiceError'
+import { ListMeasuresByCustomerResponse } from '../../types/listMeasureResponse'
 import { MeasureEnum, MeasureType } from '../../types/measureType'
 import {
    type UploadMeasureRequestDTO,
@@ -12,7 +13,7 @@ export class UploadMeasureUseCase {
    constructor(
       private measureRepository: MeasureRepository,
       private geminiApiClient: GeminiApiClient
-   ) {}
+   ) { }
 
    async execute({
       data
@@ -29,19 +30,18 @@ export class UploadMeasureUseCase {
          }
       }
 
-      // Logica para validar se a data é do mesmo mês se for retorna.
-      // const findMeasure = await this.measureRepository.listMeasuresByCustomer({
-      //    customer_code: data.customer_code,
-      //    measure_type: data.measure_type
-      // })
+      const findMeasure = await this.measureRepository.listMeasuresByCustomer({
+         customer_code: data.customer_code,
+         measure_type: data.measure_type
+      })
 
-      // if (findMeasure) {
-      //    return {
-      //       error_status: 409,
-      //       error_code: 'DOUBLE_REPORT',
-      //       error_description: 'Leitura do mês já realizada'
-      //    }
-      // }
+      if (this.hasDoubleMeasureByMonth({ measures: findMeasure, newMeasure: data })) {
+         return {
+            error_status: 409,
+            error_code: 'DOUBLE_REPORT',
+            error_description: 'Leitura do mês já realizada'
+         }
+      }
 
       const image_url = `${data.image_temp_info.protocol}://${data.image_temp_info.host}/temp/${data.image!.filename}`
 
@@ -82,7 +82,7 @@ export class UploadMeasureUseCase {
    }
 
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   verifyFields(data: any): {
+   private verifyFields(data: any): {
       message?: string
       isValid: boolean
    } {
@@ -133,8 +133,25 @@ export class UploadMeasureUseCase {
       }
    }
 
-   isValidISO8601(dateString: string): boolean {
+   private isValidISO8601(dateString: string): boolean {
       const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d+)?Z$/
       return regex.test(dateString)
    }
+
+   private hasDoubleMeasureByMonth(
+      { measures, newMeasure }: { measures: ListMeasuresByCustomerResponse[] | [], newMeasure: UploadMeasureRequestDTO }
+   ): boolean {
+      const newMeasureMonth = new Date(newMeasure.measure_datetime).getMonth();
+
+
+      const existingMeasuresForMonth = measures.filter(measure => {
+         const measureMonth = new Date(measure.measure_datetime).getMonth();
+         return measure.measure_type === newMeasure.measure_type && measureMonth === newMeasureMonth;
+      });
+
+      return existingMeasuresForMonth.length > 0
+   }
+
+
+
 }

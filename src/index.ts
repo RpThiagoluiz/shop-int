@@ -5,12 +5,13 @@ import path from 'path'
 
 const app = express()
 
+//TODO: fiz na leitura da URL
 app.use('/temp', express.static(path.join(__dirname, 'temp')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-//TODO: Ajustar o nome da rota
-app.use('/measure', measureRoutes)
+
+app.use('/', measureRoutes)
 
 const server = createServer(app)
 

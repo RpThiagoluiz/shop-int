@@ -16,7 +16,7 @@ Content-Disposition: form-data; name="measure_datetime"
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="measure_type"
 
-GAS
+WATER
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="image"; filename="base64.txt"
 Content-Type: text/plain
@@ -27,7 +27,7 @@ Content-Type: text/plain
 ### GET - List Measures
 GET {{baseUrl}}/test/list?measure_type=array
 ### GET - List Measures
-GET {{baseUrl}}/A1/list?measure_type=gas
+GET {{baseUrl}}/{{customer_code}}/list?measure_type=gas
 ### GET - List Measures
 GET {{baseUrl}}/test/list
 
@@ -36,7 +36,7 @@ PATCH {{baseUrl}}/confirm
 Content-Type: application/json
 
 {
-  "measure_uuid": "ba3e85be-e8de-436b-95d2-d8ffa1b32b88",
+  "measure_uuid": "71bcf1c5-6623-4521-bc20-86a7b896a2ab",
   "confirmed_value": 23
 }
 
