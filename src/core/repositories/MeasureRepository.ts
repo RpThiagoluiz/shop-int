@@ -10,7 +10,7 @@ export interface MeasureRepository {
    confirmMeasure({
       measure_uuid,
       confirmed_value,
-      has_confirmed,
+      has_confirmed
    }: {
       measure_uuid: string
       confirmed_value: number

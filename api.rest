@@ -12,7 +12,7 @@ Content-Disposition: form-data; name="customer_code"
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="measure_datetime"
 
-2024-08-29T10:30:00Z
+2024-10-29T10:30:00Z
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="measure_type"
 

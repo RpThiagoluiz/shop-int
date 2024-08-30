@@ -4,7 +4,6 @@ import { listMeasureFunction } from '../function/listMeasureFunction'
 import { confirmMeasureFunction } from '../function/confirmMeasureFunction'
 import { multipartMiddleware } from '../middleware/multpart.middleware'
 
-
 const router = Router()
 
 router.post('/upload', multipartMiddleware.upload().single('image'), (req, res) =>
