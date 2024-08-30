@@ -9,10 +9,12 @@ export interface MeasureRepository {
    save({ data }: { data: MeasureEntity }): Promise<CreateMeasureResponse>
    confirmMeasure({
       measure_uuid,
-      confirmed_value
+      confirmed_value,
+      has_confirmed,
    }: {
       measure_uuid: string
       confirmed_value: number
+      has_confirmed: boolean
    }): Promise<void>
    listMeasuresByCustomer({
       customer_code,

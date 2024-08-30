@@ -3,7 +3,7 @@ import { ConfirmMeasureRequestDTO, ConfirmMeasureResponseDTO } from '../dtos/con
 import { ServiceError } from '../../types/ServiceError'
 
 export class ConfirmMeasureUseCase {
-   constructor(private measureRepository: MeasureRepository) {}
+   constructor(private measureRepository: MeasureRepository) { }
 
    async execute(
       data: ConfirmMeasureRequestDTO
@@ -31,14 +31,15 @@ export class ConfirmMeasureUseCase {
       if (measure.has_confirmed) {
          return {
             error_status: 404,
-            error_code: 'MEASURE_HAS_CONFIRMED',
+            error_code: 'CONFIRMATION_DUPLICATE',
             error_description: 'Leitura do mês já realizada'
          }
       }
 
       await this.measureRepository.confirmMeasure({
          measure_uuid: data.measure_uuid,
-         confirmed_value: data.confirmed_value
+         confirmed_value: data.confirmed_value,
+         has_confirmed: true
       })
 
       return { success: true }

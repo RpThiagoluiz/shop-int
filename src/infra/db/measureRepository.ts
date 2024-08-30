@@ -25,17 +25,20 @@ export class PostgresMeasureRepository implements MeasureRepository {
 
    async confirmMeasure({
       measure_uuid,
-      confirmed_value
+      confirmed_value,
+      has_confirmed
    }: {
       measure_uuid: string
       confirmed_value: number
+      has_confirmed: boolean
    }): Promise<void> {
       await this.measureDB.update({
          where: {
             measure_uuid
          },
          data: {
-            measure_value: confirmed_value
+            measure_value: confirmed_value,
+            has_confirmed: has_confirmed
          }
       })
    }
