@@ -1,4 +1,4 @@
-import { GeminiApiClient } from '../../infra/external/LLM'
+import { LLMApiClient } from '../../infra/external/LLM'
 import { ServiceError } from '../../types/ServiceError'
 import { ListMeasuresByCustomerResponse } from '../../types/listMeasureResponse'
 import { MeasureEnum, MeasureType } from '../../types/measureType'
@@ -12,7 +12,7 @@ import { MeasureRepository } from '../repositories/MeasureRepository'
 export class UploadMeasureUseCase {
    constructor(
       private measureRepository: MeasureRepository,
-      private geminiApiClient: GeminiApiClient
+      private llmApiClient: LLMApiClient
    ) { }
 
    async execute({
@@ -43,9 +43,10 @@ export class UploadMeasureUseCase {
          }
       }
 
+      //TODO: erro de encontrar a imagem
       const image_url = `${data.image_temp_info.protocol}://${data.image_temp_info.host}/temp/${data.image!.filename}`
 
-      const LLMResponse = await this.geminiApiClient.getMeasureFromImage({
+      const LLMResponse = await this.llmApiClient.getMeasureFromImage({
          imageBase64: data.image,
          measureType: data.measure_type
       })
@@ -66,11 +67,7 @@ export class UploadMeasureUseCase {
          image_url: image_url
       })
 
-      /**
-       * TODO:
-       * lidar com erros ao salvar no banco de dados
-       * Rollback
-       */
+
 
       const measureInsert = await this.measureRepository.save({ data: newMeasure })
 
@@ -138,20 +135,20 @@ export class UploadMeasureUseCase {
       return regex.test(dateString)
    }
 
-   private hasDoubleMeasureByMonth(
-      { measures, newMeasure }: { measures: ListMeasuresByCustomerResponse[] | [], newMeasure: UploadMeasureRequestDTO }
-   ): boolean {
-      const newMeasureMonth = new Date(newMeasure.measure_datetime).getMonth();
+   private hasDoubleMeasureByMonth({
+      measures,
+      newMeasure
+   }: {
+      measures: ListMeasuresByCustomerResponse[] | []
+      newMeasure: UploadMeasureRequestDTO
+   }): boolean {
+      const newMeasureMonth = new Date(newMeasure.measure_datetime).getMonth()
 
-
-      const existingMeasuresForMonth = measures.filter(measure => {
-         const measureMonth = new Date(measure.measure_datetime).getMonth();
-         return measure.measure_type === newMeasure.measure_type && measureMonth === newMeasureMonth;
-      });
+      const existingMeasuresForMonth = measures.filter((measure) => {
+         const measureMonth = new Date(measure.measure_datetime).getMonth()
+         return measure.measure_type === newMeasure.measure_type && measureMonth === newMeasureMonth
+      })
 
       return existingMeasuresForMonth.length > 0
    }
-
-
-
 }

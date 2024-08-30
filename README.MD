@@ -14,10 +14,9 @@ yarn build
 
 Criar testes unitários com o que já temos
 
-# Important
-
-Realizar a integração do LLM
-
 # Revisar
 
 Port 80:80 -> 80
+
+# LLM - Gemini para a leitura de image e extração de conta.
+O llm em questão retorna diferentes valores para a mesma leitura, contudo a integração foi um sucesso.

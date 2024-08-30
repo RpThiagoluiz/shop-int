@@ -16,6 +16,7 @@
    "author": "Thiago Luiz Gonçalves <rp.thiagoluiz@gmail.com>",
    "license": "MIT",
    "dependencies": {
+      "@google/generative-ai": "^0.17.1",
       "@prisma/client": "^5.19.0",
       "express": "^4.19.2",
       "multer": "^1.4.5-lts.1",

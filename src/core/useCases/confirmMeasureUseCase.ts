@@ -3,7 +3,7 @@ import { ConfirmMeasureRequestDTO, ConfirmMeasureResponseDTO } from '../dtos/con
 import { ServiceError } from '../../types/ServiceError'
 
 export class ConfirmMeasureUseCase {
-   constructor(private measureRepository: MeasureRepository) { }
+   constructor(private measureRepository: MeasureRepository) {}
 
    async execute(
       data: ConfirmMeasureRequestDTO

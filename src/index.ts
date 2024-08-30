@@ -10,7 +10,6 @@ app.use('/temp', express.static(path.join(__dirname, 'temp')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-
 app.use('/', measureRoutes)
 
 const server = createServer(app)

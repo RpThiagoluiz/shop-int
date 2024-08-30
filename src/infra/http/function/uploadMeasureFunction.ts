@@ -1,11 +1,11 @@
 import { UploadMeasureController } from '../../../core/controllers/uploadMeasureController'
 import { UploadMeasureUseCase } from '../../../core/useCases/uploadMeasureUseCase'
 import { PostgresMeasureRepository } from '../../db/measureRepository'
-import { GeminiApiClient } from '../../external/LLM'
+import { LLMApiClient } from '../../external/LLM'
 
-const geminiApiClient = new GeminiApiClient()
+const llmApiClient = new LLMApiClient()
 const measureRepository = new PostgresMeasureRepository()
 
-const uploadMeasureUseCase = new UploadMeasureUseCase(measureRepository, geminiApiClient)
+const uploadMeasureUseCase = new UploadMeasureUseCase(measureRepository, llmApiClient)
 
 export const uploadMeasureFunction = new UploadMeasureController(uploadMeasureUseCase)
