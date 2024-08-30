@@ -12,7 +12,7 @@ export class GeminiApiClient {
       imageBase64,
       measureType
    }: {
-      imageBase64: string
+      imageBase64: Express.Multer.File | undefined
       measureType: MeasureType
    }): Promise<Result> {
       try {

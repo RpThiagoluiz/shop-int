@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, Response } from '../../types/httpResponseAndRequestTypes'
 import { ListMeasuresUseCase } from '../useCases/listMeasureUseCase'
 
 export class ListMeasuresController {

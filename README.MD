@@ -13,8 +13,11 @@ yarn build
 ```
 
 Criar testes unitários com o que já temos
-Ajustar como a imagem chega para o backend, ela deve ser um multpart devido ao tamanho.
 
 # Important
+
 Realizar a integração do LLM
-Imagem deve ser temporária
+
+# Revisar
+
+Port 80:80 -> 80

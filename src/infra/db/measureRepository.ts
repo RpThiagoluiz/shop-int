@@ -7,18 +7,16 @@ import { type ListMeasuresByCustomerResponse } from '../../types/listMeasureResp
 import { type FindMeasureById } from '../../types/findMeasuseById'
 
 export class PostgresMeasureRepository implements MeasureRepository {
-
    private measureDB = db.measure
 
    async findByUuid({ measure_uuid }: { measure_uuid: string }): Promise<FindMeasureById> {
-
       const measure = await this.measureDB.findFirst({
          select: {
             measure_uuid: true,
-            has_confirmed: true,
+            has_confirmed: true
          },
          where: {
-            measure_uuid,
+            measure_uuid
          }
       })
 
@@ -32,7 +30,6 @@ export class PostgresMeasureRepository implements MeasureRepository {
       measure_uuid: string
       confirmed_value: number
    }): Promise<void> {
-
       await this.measureDB.update({
          where: {
             measure_uuid
@@ -41,7 +38,6 @@ export class PostgresMeasureRepository implements MeasureRepository {
             measure_value: confirmed_value
          }
       })
-
    }
 
    async listMeasuresByCustomer({
@@ -51,14 +47,13 @@ export class PostgresMeasureRepository implements MeasureRepository {
       customer_code: string
       measure_type?: MeasureType
    }): Promise<ListMeasuresByCustomerResponse[] | []> {
-
       const measures = await this.measureDB.findMany({
          select: {
             measure_uuid: true,
             measure_datetime: true,
             measure_type: true,
             has_confirmed: true,
-            image_url: true,
+            image_url: true
          },
          where: {
             customer_code,
@@ -70,7 +65,6 @@ export class PostgresMeasureRepository implements MeasureRepository {
    }
 
    async save({ data }: { data: MeasureEntity }): Promise<CreateMeasureResponse> {
-
       const measure = await this.measureDB.create({
          data: {
             customer_code: data.customer_code,
@@ -84,7 +78,7 @@ export class PostgresMeasureRepository implements MeasureRepository {
       return {
          measure_uuid: measure.measure_uuid,
          image_url: measure.image_url,
-         measure_value: measure.measure_value,
+         measure_value: measure.measure_value
       }
    }
 }

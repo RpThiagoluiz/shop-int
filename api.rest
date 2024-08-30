@@ -1,23 +1,33 @@
 @baseUrl = http://localhost:3000
-# Definindo a data no formato ISO 8601
-let data = new Date().toISOString();
-### POST
+@customer_code = 123456
+
+### Teste de Upload da Imagem
 POST {{baseUrl}}/upload
-Content-Type: application/json
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
-{
-  "image": "asset2",
-  "customer_code": "A1",
-  "measure_datetime": "2024-08-29T10:30:00Z",
-  "measure_type": "GAS"
-}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="customer_code"
 
-### "measure_uuid": "ba3e85be-e8de-436b-95d2-d8ffa1b32b88"
+{{customer_code}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="measure_datetime"
+
+2024-08-29T10:30:00Z
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="measure_type"
+
+WATER
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="base64.txt"
+Content-Type: text/plain
+
+< ./mock/base64.txt
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ### GET - List Measures
 GET {{baseUrl}}/test/list?measure_type=array
 ### GET - List Measures
-GET {{baseUrl}}/A1/list?measure_type=gas
+GET {{baseUrl}}/{{customer_code}}/list?measure_type=gas
 ### GET - List Measures
 GET {{baseUrl}}/test/list
 
@@ -26,7 +36,7 @@ PATCH {{baseUrl}}/confirm
 Content-Type: application/json
 
 {
-  "measure_uuid": "ba3e85be-e8de-436b-95d2-d8ffa1b32b88",
+  "measure_uuid": "71bcf1c5-6623-4521-bc20-86a7b896a2ab",
   "confirmed_value": 23
 }
 

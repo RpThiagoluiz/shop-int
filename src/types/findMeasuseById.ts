@@ -1,4 +1,4 @@
 export type FindMeasureById = {
-  measure_uuid: string,
-  has_confirmed: boolean,
+   measure_uuid: string
+   has_confirmed: boolean
 } | null
