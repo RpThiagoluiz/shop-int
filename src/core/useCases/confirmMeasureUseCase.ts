@@ -3,7 +3,7 @@ import { ConfirmMeasureRequestDTO, ConfirmMeasureResponseDTO } from '../dtos/con
 import { ServiceError } from '../../types/ServiceError'
 
 export class ConfirmMeasureUseCase {
-   constructor(private measureRepository: MeasureRepository) {}
+   constructor(private measureRepository: MeasureRepository) { }
 
    async execute(
       data: ConfirmMeasureRequestDTO
@@ -49,8 +49,6 @@ export class ConfirmMeasureUseCase {
 function checkMeasureData(data: ConfirmMeasureRequestDTO) {
    const requiredKeys = ['measure_uuid', 'confirmed_value']
    const hasAllKeys = requiredKeys.every((key) => key in data)
-
-   console.log({ data, m: typeof data.measure_uuid, dif: typeof data.measure_uuid !== 'string' })
 
    if (!hasAllKeys)
       return {

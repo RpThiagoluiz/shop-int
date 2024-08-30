@@ -17,5 +17,5 @@ const server = createServer(app)
 const port = process.env.PORT || 80
 
 server.listen(port, () => {
-   console.log(`🪁 *Server running on port ${port}, http://localhost:${port}`)
+   console.log(`🪁 *Server running on dev port ${port}, prd http://localhost`)
 })
