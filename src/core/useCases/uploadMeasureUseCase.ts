@@ -1,8 +1,10 @@
-import { Buffer } from 'buffer'
 import { GeminiApiClient } from '../../infra/external/LLM'
 import { ServiceError } from '../../types/ServiceError'
 import { MeasureEnum, MeasureType } from '../../types/measureType'
-import { UploadMeasureRequestDTO, UploadMeasureResponseDTO } from '../dtos/uploadMeasureDTO'
+import {
+   type UploadMeasureRequestDTO,
+   type UploadMeasureResponseDTO
+} from '../dtos/uploadMeasureDTO'
 import { MeasureEntity } from '../entities/measureEntity'
 import { MeasureRepository } from '../repositories/MeasureRepository'
 
@@ -10,10 +12,14 @@ export class UploadMeasureUseCase {
    constructor(
       private measureRepository: MeasureRepository,
       private geminiApiClient: GeminiApiClient
-   ) { }
+   ) {}
 
-   async execute(data: UploadMeasureRequestDTO): Promise<UploadMeasureResponseDTO | ServiceError> {
-      const checkData = verifyFields(data)
+   async execute({
+      data
+   }: {
+      data: UploadMeasureRequestDTO
+   }): Promise<UploadMeasureResponseDTO | ServiceError> {
+      const checkData = this.verifyFields(data)
 
       if (!checkData.isValid) {
          return {
@@ -25,18 +31,19 @@ export class UploadMeasureUseCase {
 
       // Logica para validar se a data é do mesmo mês se for retorna.
       // const findMeasure = await this.measureRepository.listMeasuresByCustomer({
-      //    customerCode: data.customerCode,
-      //    measureType: data.measureType
+      //    customer_code: data.customer_code,
+      //    measure_type: data.measure_type
       // })
 
       // if (findMeasure) {
-      //
       //    return {
       //       error_status: 409,
       //       error_code: 'DOUBLE_REPORT',
       //       error_description: 'Leitura do mês já realizada'
       //    }
       // }
+
+      const image_url = `${data.image_temp_info.protocol}://${data.image_temp_info.host}/temp/${data.image!.filename}`
 
       const LLMResponse = await this.geminiApiClient.getMeasureFromImage({
          imageBase64: data.image,
@@ -56,7 +63,7 @@ export class UploadMeasureUseCase {
          measure_datetime: data.measure_datetime,
          measure_type: data.measure_type.toUpperCase() as MeasureType,
          measure_value: LLMResponse.measure_value,
-         image_url: 'https://storage.googleapis.com/generativeai-downloads/images/jetpack.jpg',
+         image_url: image_url
       })
 
       /**
@@ -73,87 +80,61 @@ export class UploadMeasureUseCase {
          measure_uuid: measureInsert.measure_uuid
       }
    }
-}
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function verifyFields(data: any): {
-   message?: string
-   isValid: boolean
-} {
-   const requiredKeys = ['image', 'customer_code', 'measure_datetime', 'measure_type']
-   const hasAllKeys = requiredKeys.every((key) => key in data)
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   verifyFields(data: any): {
+      message?: string
+      isValid: boolean
+   } {
+      const requiredKeys = ['image', 'customer_code', 'measure_datetime', 'measure_type']
+      const hasAllKeys = requiredKeys.every((key) => key in data)
 
-   if (!hasAllKeys)
-      return {
-         isValid: false,
-         message: 'Verifique os campos enviados, alguns campos estão faltando.'
+      if (!hasAllKeys)
+         return {
+            isValid: false,
+            message: 'Verifique os campos enviados, alguns campos estão faltando.'
+         }
+
+      const fieldsErros: string[] = []
+      let isValid = true
+
+      //TODO: validar a image, se a msm é um base64
+
+      if (typeof data.customer_code !== 'string') {
+         isValid = false
+         fieldsErros.push('código do cliente')
       }
 
-   const fieldsErros: string[] = []
-   let isValid = true
+      if (!this.isValidISO8601(data.measure_datetime)) {
+         isValid = false
+         fieldsErros.push('data mensurada(ISO8601)')
+      }
 
-   // if (!isValidImage(data.image)) {
-   //    isValid = false
-   //    fieldsErros.push('formato da imagem')
-   // }
+      if (
+         data.measure_type.toUpperCase() !== MeasureEnum.GAS &&
+         data.measure_type.toUpperCase() !== MeasureEnum.WATER
+      ) {
+         isValid = false
+         fieldsErros.push('tipo mensurado')
+      }
 
-   if (typeof data.customer_code !== 'string') {
-      isValid = false
-      fieldsErros.push('código do cliente')
-   }
+      if (!isValid) {
+         return {
+            isValid,
+            message:
+               fieldsErros.length > 1
+                  ? `Os campo informados precisam ser corrigidos, ${fieldsErros.pop()}.`
+                  : `Campo precisa ser corrigido, ${fieldsErros[0]}.`
+         }
+      }
 
-   if (!isValidISO8601(data.measure_datetime)) {
-      isValid = false
-      fieldsErros.push('data mensurada(ISO8601)')
-   }
-
-   if (
-      data.measure_type.toUpperCase() !== MeasureEnum.GAS &&
-      data.measure_type.toUpperCase() !== MeasureEnum.WATER
-   ) {
-      isValid = false
-      fieldsErros.push('tipo mensurado')
-   }
-
-   if (!isValid) {
       return {
-         isValid,
-         message:
-            fieldsErros.length > 1
-               ? `Os campo informados precisam ser corrigidos, ${fieldsErros.pop()}.`
-               : `Campo precisa ser corrigido, ${fieldsErros[0]}.`
+         isValid
       }
    }
 
-   return {
-      isValid
-   }
-}
-
-function isValidISO8601(dateString: string): boolean {
-   const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d+)?Z$/;
-   return regex.test(dateString);
-}
-
-// Utils para validar a image
-// e outro para realizar a criação da url temporaria.
-function isValidImage(base64String: string): boolean {
-   if (typeof base64String !== 'string') {
-      return false
-   }
-
-   const regex = /^data:image\/(png|jpeg|WEBP|HEIC|HEIF);base64,/
-   if (!regex.test(base64String)) {
-      return false
-   }
-
-   const base64Data = base64String.replace(/^data:image\/\w+;base64,/, '')
-
-   try {
-      Buffer.from(base64Data, 'base64')
-      return true
-   } catch (error) {
-      console.error('ERROR IN validateBase64Image', { error })
-      return false
+   isValidISO8601(dateString: string): boolean {
+      const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:.\d+)?Z$/
+      return regex.test(dateString)
    }
 }

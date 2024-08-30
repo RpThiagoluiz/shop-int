@@ -7,4 +7,5 @@ const geminiApiClient = new GeminiApiClient()
 const measureRepository = new PostgresMeasureRepository()
 
 const uploadMeasureUseCase = new UploadMeasureUseCase(measureRepository, geminiApiClient)
+
 export const uploadMeasureFunction = new UploadMeasureController(uploadMeasureUseCase)

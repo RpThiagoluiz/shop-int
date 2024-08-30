@@ -1,16 +1,16 @@
 import { createServer } from 'http'
 import express from 'express'
 import measureRoutes from './infra/http/routes/measureRoutes'
+import path from 'path'
 
 const app = express()
 
+app.use('/temp', express.static(path.join(__dirname, 'temp')))
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-app.use('/', measureRoutes)
-
-// app.use((err: Error, req: express.Request, res: express.Response) => {
-//    res.status(500).json({ error: err.message })
-// })
+//TODO: Ajustar o nome da rota
+app.use('/measure', measureRoutes)
 
 const server = createServer(app)
 
