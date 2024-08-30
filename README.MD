@@ -1,28 +1,33 @@
-# Watch
+# Back-end API para Gerenciamento de Medições
 
-node >= 20 for read .env file natively
+## Iniciar
 
-```bash
-yarn start:dev
-```
-
-# Build
+Para iniciar a aplicação, use o seguinte comando:
 
 ```bash
-yarn build
+docker-compose up --build
 ```
+## Testar
+Root do existe um arquivo chamado <b>api.rest</b> basta ter a extensão <b>rest client</b> do vsCode instalada e testar a aplicação.
 
-Criar testes unitários com o que já temos
+## Tech
 
-# Revisar
+![Node.js](https://img.shields.io/badge/Node.js-20-green)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)
+![Docker](https://img.shields.io/badge/Docker-20.10-blue)
+![Prisma](https://img.shields.io/badge/Prisma-5.19-yellow)
+![Jest](https://img.shields.io/badge/Jest-29.7-red)
+![ESLint](https://img.shields.io/badge/ESLint-9.9-brightgreen)
+![Prettier](https://img.shields.io/badge/Prettier-3.3.3-lightgrey)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Port 80:80 -> 80
+Este projeto é uma API REST desenvolvida em Node.js com TypeScript. A API gerencia a leitura de consumo de água e gás e utiliza Docker para conteinerização. Além de realizar a leitura via base64 que é enviado para um LLM que revolve o valor da conta enviada.
 
-# LLM - Gemini para a leitura de image e extração de conta.
+### Rotas
+`GET /<customer code>/list` <br/>
+`PATCH /confirm` <br/>
+`POST /upload` <br/>
 
-O llm em questão retorna diferentes valores para a mesma leitura, contudo a integração foi um sucesso.
+### Node
+Node version >= 20
 
-# Checks
-
-[] Date é um iso 8601
-[] se o base64 e dos tipos aceitos pelo LLM

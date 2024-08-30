@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:3000
+@baseUrl = http://localhost
 @customer_code = 123456
 
 ### Teste de Upload da Imagem
@@ -12,7 +12,7 @@ Content-Disposition: form-data; name="customer_code"
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="measure_datetime"
 
-2024-10-29T10:30:00Z
+2025-12-29T10:30:00Z
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="measure_type"
 
