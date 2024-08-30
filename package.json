@@ -6,7 +6,7 @@
    "scripts": {
       "start": "tsx src/index.ts",
       "start:dev": "tsx watch --env-file .env src/index.ts",
-      "build": "tsup src/index.ts --format esm,cjs --dts --minify",
+      "build": "tsc --project tsconfig.build.json",
       "test": "jest",
       "format": "prettier --write .",
       "lint": "eslint . ",
@@ -37,7 +37,6 @@
       "prettier": "^3.3.3",
       "prisma": "^5.19.0",
       "ts-jest": "^29.2.5",
-      "tsup": "^8.2.4",
       "tsx": "^4.19.0",
       "typescript": "^5.5.4",
       "typescript-eslint": "^8.3.0"
