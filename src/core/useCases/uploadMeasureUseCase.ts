@@ -13,7 +13,7 @@ export class UploadMeasureUseCase {
    constructor(
       private measureRepository: MeasureRepository,
       private llmApiClient: LLMApiClient
-   ) {}
+   ) { }
 
    async execute({
       data
@@ -93,8 +93,6 @@ export class UploadMeasureUseCase {
       const fieldsErros: string[] = []
       let isValid = true
 
-      //TODO: validar a image, se a msm é um base64
-
       if (typeof data.customer_code !== 'string') {
          isValid = false
          fieldsErros.push('código do cliente')
@@ -140,14 +138,20 @@ export class UploadMeasureUseCase {
       measures: ListMeasuresByCustomerResponse[] | []
       newMeasure: UploadMeasureRequestDTO
    }): boolean {
-      const newMeasureMonth = new Date(newMeasure.measure_datetime).getMonth()
+      const newMeasureDate = new Date(newMeasure.measure_datetime);
+      const newMeasureMonth = newMeasureDate.getMonth();
+      const newMeasureYear = newMeasureDate.getFullYear();
 
       const existingMeasuresForMonth = measures.filter((measure) => {
-         const measureMonth = new Date(measure.measure_datetime).getMonth()
-         return measure.measure_type === newMeasure.measure_type && measureMonth === newMeasureMonth
-      })
+         const measureDate = new Date(measure.measure_datetime);
+         const measureMonth = measureDate.getMonth();
+         const measureYear = measureDate.getFullYear();
+         return measure.measure_type === newMeasure.measure_type &&
+            measureMonth === newMeasureMonth &&
+            measureYear === newMeasureYear;
+      });
 
-      return existingMeasuresForMonth.length > 0
+      return existingMeasuresForMonth.length > 0;
    }
 
    //Poderia ser refatorado para um metodo mais abrangente
