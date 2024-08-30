@@ -13,7 +13,7 @@ export class UploadMeasureUseCase {
    constructor(
       private measureRepository: MeasureRepository,
       private llmApiClient: LLMApiClient
-   ) { }
+   ) {}
 
    async execute({
       data
@@ -51,7 +51,7 @@ export class UploadMeasureUseCase {
          measureType: data.measure_type
       })
 
-      if ('error_code' in LLMResponse) {
+      if (this.isServiceError(LLMResponse)) {
          return {
             error_status: LLMResponse.error_status,
             error_code: LLMResponse.error_code,
@@ -66,8 +66,6 @@ export class UploadMeasureUseCase {
          measure_value: LLMResponse.measure_value,
          image_url: image_url
       })
-
-
 
       const measureInsert = await this.measureRepository.save({ data: newMeasure })
 
@@ -150,5 +148,11 @@ export class UploadMeasureUseCase {
       })
 
       return existingMeasuresForMonth.length > 0
+   }
+
+   //Poderia ser refatorado para um metodo mais abrangente
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   private isServiceError(response: any): response is ServiceError {
+      return response && 'error_code' in response
    }
 }
